@@ -87,6 +87,16 @@ module.exports = (function(){
    * @returns {*}
    */
   function makeRequest(collectionName, methodName, cb, options, values) {
+    var values = null;
+
+    // Adding ability to manipulate the structure of the JSON before POSTing to the api
+    if (formValues) {
+      var values = {},
+          collectionNameSingular = collectionName.substring(0, collectionName.length - 1);
+
+      values[collectionNameSingular] = formValues;
+    }
+    
     var r = null,
         opt = null,
         cache = collections[collectionName].cache,
