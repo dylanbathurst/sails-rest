@@ -90,7 +90,17 @@ module.exports = (function() {
    * @param values values from method
    * @returns {*}
    */
-  function makeRequest(identity, collectionName, methodName, cb, options, values) {
+  function makeRequest(collectionName, methodName, cb, options, formValues) {
+    var values = null;
+
+    // Adding ability to manipulate the structure of the JSON before POSTing to the api
+    if (formValues) {
+      var values = {},
+          collectionNameSingular = collectionName.substring(0, collectionName.length - 1);
+
+      values[collectionNameSingular] = formValues;
+    }
+
     var r = null,
       opt = null,
       cache = connections[identity].cache,
