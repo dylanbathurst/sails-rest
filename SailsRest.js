@@ -206,9 +206,21 @@ module.exports = (function() {
 
       // Make request via restify
       if (opt) {
-        connection[restMethod](path, opt, callback);
+        async.forEach(config.middleware, function (middleware, loopCallback) {
+          middleware(connection, loopCallback);
+        }, function (err) {
+          if (err) return cb(new Error(err));
+
+          connection[restMethod](path, opt, callback);
+        });
       } else {
-        connection[restMethod](path, callback);
+        async.forEach(config.middleware, function (middleware, loopCallback) {
+          middleware(connection, loopCallback);
+        }, function (err) {
+          if (err) return cb(new Error(err));
+
+          connection[restMethod](path, callback);
+        });
       }
     } else {
       cb(new Error('Invalid REST method: ' + restMethod));
@@ -237,6 +249,7 @@ module.exports = (function() {
         update: 'put',
         destroy: 'del'
       },
+      middleware: function () {return []},
       beforeFormatResult: null,
       afterFormatResult: null,
       beforeFormatResults: null,
@@ -256,6 +269,9 @@ module.exports = (function() {
       if (!_.isFunction(restify[clientMethod])) {
         throw new Error('Invalid type provided');
       }
+
+      // load middleware
+      config.middleware();
 
       instance = {
         config: config,
