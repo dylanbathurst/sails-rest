@@ -41,6 +41,13 @@ module.exports.adapters = {
       update: 'put',
       destroy: 'del'
     },
+    middleware: function () {
+      function runOauthCheck(connection, next) {            // gives you access to the restify request
+        OauthService.runOauthCheck(connection, next);       // do custom middleware and call next
+      }
+
+      return [runOauthCheck];                               // return array of middleware functions to run
+    },
     beforeFormatResult: function(result){return result},    // alter result prior to formatting
     afterFormatResult: function(result){return result},     // alter result after formatting
     beforeFormatResults: function(results){return results}, // alter results prior to formatting
