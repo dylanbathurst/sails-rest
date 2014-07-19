@@ -188,7 +188,7 @@ module.exports = (function(){
       // Make request via restify
       if (opt) {
         async.forEach(config.middleware, function (middleware, loopCallback) {
-          middleware(connection, loopCallback);
+          middleware(connection, opt, collectionName, loopCallback);
         }, function (err) {
           if (err) return cb(new Error(err));
 
