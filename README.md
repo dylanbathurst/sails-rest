@@ -42,11 +42,21 @@ module.exports.adapters = {
       destroy: 'del'
     },
     middleware: function () {
-      function runOauthCheck(connection, next) {            // gives you access to the restify request
+      function runOauthCheck(connection, opt, collectionName, next) { // gives you access to the restify request
         OauthService.runOauthCheck(connection, next);       // do custom middleware and call next
       }
 
-      return [runOauthCheck];                               // return array of middleware functions to run
+      function modifyPostBodyBeforeSending(connection, opt, collectionName, next) {
+        if (collectionName === 'user') {
+          var obj = _.clone(opt);
+
+          model[collectionName] = obj;                      // { name: 'Dylan' } becomes { user: { name: 'Dylan' } }
+        }
+
+        next();
+      }
+
+      return [runOauthCheck, modifyPostBodyBeforeSending];  // return array of middleware functions to run
     },
     beforeFormatResult: function(result){return result},    // alter result prior to formatting
     afterFormatResult: function(result){return result},     // alter result after formatting
